@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.google.android.exoplayer2.ui.PlayerView
+            android:id="@+id/player_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/darkGray"
+            app:layout_constraintHeight_percent="0.5"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+            android:id="@+id/name_video"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Typical name video"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/player_view" />
+
+        <TextView
+            android:id="@+id/user"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Typical user"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/name_video" />
+
+        <TextView
+            android:id="@+id/viewed_count"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="999K"
+            app:layout_constraintEnd_toStartOf="@id/like_count"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/user" />
+
+        <TextView
+            android:id="@+id/like_count"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="222"
+            app:layout_constraintEnd_toStartOf="@id/date_video"
+            app:layout_constraintStart_toEndOf="@id/viewed_count"
+            app:layout_constraintTop_toBottomOf="@id/user" />
+
+        <TextView
+            android:id="@+id/date_video"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="10 Jun 2016"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/like_count"
+            app:layout_constraintTop_toBottomOf="@id/user" />
+
+        <TextView
+            android:id="@+id/tags"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/tags_for_this_video"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/date_video" />
+
+        <TextView
+            android:id="@+id/group_featuring"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/groups_featuring_this_video"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tags" />
+
+        <TextView
+            android:id="@+id/favorited"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/favorited"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/group_featuring" />
+
+        <TextView
+            android:id="@+id/galleries"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/galleries"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/favorited" />
+
+        <TextView
+            android:id="@+id/comments"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/comments"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/galleries" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

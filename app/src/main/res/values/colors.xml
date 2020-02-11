@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">@color/lightGray</color>
+    <color name="colorPrimaryDark">@color/darkGray</color>
+    <color name="colorAccent">#D81B60</color>
+
+    <color name="lightGray">#0e0e0e</color>
+    <color name="darkGray">#0c0c0c</color>
+    <color name="darkestGray">#010101</color>
+
+    <color name="cardVideos">#161616</color>
+
+</resources>
