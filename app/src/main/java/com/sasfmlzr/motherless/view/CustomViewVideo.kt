@@ -5,9 +5,8 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import com.sasfmlzr.motherless.adapter.VideosAdapter
+import com.sasfmlzr.motherless.adapter.VideoAdapter
 import com.sasfmlzr.motherless.databinding.ViewVideosBinding
-import com.sasfmlzr.motherless.entity.PreviewData
 import com.sasfmlzr.motherless.entity.UnknownPreviewData
 
 class CustomViewVideo @JvmOverloads constructor(
@@ -29,6 +28,6 @@ class CustomViewVideo @JvmOverloads constructor(
     }
 
     fun setItems(list: List<UnknownPreviewData>? = listOf()) {
-        binder.videoList.adapter = VideosAdapter(list!!, context)
+        binder.videoList.adapter = VideoAdapter(list!!, context)
     }
 }

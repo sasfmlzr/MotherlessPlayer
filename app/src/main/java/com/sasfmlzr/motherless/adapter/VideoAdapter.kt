@@ -15,12 +15,12 @@ import com.sasfmlzr.motherless.databinding.ItemPreviewVideoBinding
 import com.sasfmlzr.motherless.entity.NullPreviewData
 import com.sasfmlzr.motherless.entity.PreviewData
 import com.sasfmlzr.motherless.entity.UnknownPreviewData
-import com.sasfmlzr.motherless.util.Converter
 
-class VideosAdapter(
+
+class VideoAdapter(
     private val items: List<UnknownPreviewData>,
     private val context: Context?
-) : RecyclerView.Adapter<VideosAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<VideoAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(ItemPreviewVideoBinding.inflate(LayoutInflater.from(context)))
@@ -40,16 +40,26 @@ class VideosAdapter(
         when (items[position]) {
 
             is PreviewData -> {
-                val thumbnail = (items[position] as PreviewData).thumbnailLink
+                val item = items[position] as PreviewData
+                val thumbnail = item.thumbnailLink
 
                 Glide.with(context!!)
                     .load(thumbnail)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(holder.binder.previewImage)
 
+                val dateTimeFormat = if (item.sizeSeconds.hourOfDay == 0) {
+                    "mm:ss"
+                } else {
+                    "hh:mm:ss"
+                }
+
+                holder.binder.length.text = item.sizeSeconds.toString(dateTimeFormat)
+                holder.binder.nameVideo.text = item.title
+
                 holder.binder.previewImage.setOnClickListener(
                     createOnClickListener(
-                        (items[position] as PreviewData).link
+                        item.link
                     )
                 )
             }

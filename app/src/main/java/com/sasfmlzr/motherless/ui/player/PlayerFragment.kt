@@ -22,20 +22,19 @@ import com.sasfmlzr.motherless.data.repository.MotherlessRepository
 import com.sasfmlzr.motherless.databinding.FragmentPlayerBinding
 import com.sasfmlzr.motherless.di.core.FragmentComponent
 import com.sasfmlzr.motherless.di.core.Injector
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 import javax.inject.Inject
-
 
 class PlayerFragment : Fragment() {
 
     private lateinit var playerViewModel: PlayerViewModel
+    private lateinit var defaultHttpDataSource: DefaultHttpDataSourceFactory
 
     @Inject
     lateinit var motherlessRepository: MotherlessRepository
+
+    private var isVideoPrepared = false
 
     fun inject(component: FragmentComponent) = component.inject(this)
 
@@ -61,29 +60,69 @@ class PlayerFragment : Fragment() {
         playerViewModel =
             ViewModelProviders.of(this).get(PlayerViewModel::class.java)
 
-        val url = arguments?.getString("KEY_URL")?:""
+        val url = arguments?.getString("KEY_URL") ?: ""
 
         parseSite(url)
 
         val agent = Util.getUserAgent(context!!, getString(R.string.app_name))
-        val defaultHttpDataSource = DefaultHttpDataSourceFactory(agent, null)
 
-
-
-        mediaSource = ProgressiveMediaSource.Factory(defaultHttpDataSource)
-            .createMediaSource(Uri.parse(url))
+        defaultHttpDataSource = DefaultHttpDataSourceFactory(agent, null)
 
         return binding.root
     }
 
-    fun parseSite(url: String){
+    fun parseSite(url: String) {
 
         CoroutineScope(Dispatchers.Default).launch {
             val doc = Jsoup.connect(url).get().body()
 
-            val url = doc.getElementById("content").getElementsByTag("script").filter{
+            val urlVideo = doc.getElementById("content").getElementsByTag("script").filter {
                 it.attr("type") == "text/javascript"
-            }.get(0).dataNodes().get(0).wholeData.split("__fileurl = '").get(1).split("';").get(0)
+            }[0].dataNodes()[0].wholeData.split("__fileurl = '")[1].split("';")[0]
+
+            val title =
+                doc.getElementById("media-info")
+                    .getElementsByClass("media-meta-info")
+                    .first()
+                    .getElementsByTag("h1")
+                    .first()
+                    .textNodes()
+                    .first()
+                    .text()
+
+            val videoDetails = doc.getElementById("media-info")
+                .getElementsByClass("media-meta-info")
+                .first()
+                .getElementsByTag("h2").map {
+                    val key = it.children().first().textNodes().first().text()
+                    val value = it.textNodes().last().text()
+                    Pair(key, value)
+                }
+
+            val tags = doc.getElementById("media-tags-container")
+                .children()
+                .map {
+                    it.getElementsByTag("h4")
+                }
+                .flatten()
+                .map {
+                    it.children().text()
+                }
+
+            withContext(Dispatchers.Main) {
+                mediaSource = ProgressiveMediaSource.Factory(defaultHttpDataSource)
+                    .createMediaSource(Uri.parse(urlVideo))
+                if (!isVideoPrepared) {
+                    prepareVideo()
+                }
+
+                binding.nameVideo.text = title
+                binding.dateVideo.text = videoDetails[0].second
+                binding.viewedCount.text = videoDetails[1].second
+                binding.likeCount.text = videoDetails[2].second
+
+                binding.tags.text = "Tags: $tags"
+            }
 
             println()
         }
@@ -103,12 +142,6 @@ class PlayerFragment : Fragment() {
 
     }
 
-    override fun onStart() {
-        super.onStart()
-        val player = binding.playerView.player as SimpleExoPlayer
-        player.prepare(mediaSource)
-    }
-
     override fun onStop() {
         binding.playerView.player?.playWhenReady = false
         super.onStop()
@@ -117,6 +150,12 @@ class PlayerFragment : Fragment() {
     override fun onDestroy() {
         binding.playerView.player?.release()
         super.onDestroy()
+    }
+
+    private fun prepareVideo() {
+        val player = binding.playerView.player as SimpleExoPlayer
+        player.prepare(mediaSource)
+        isVideoPrepared = true
     }
 
     private val playerListener by lazy {
