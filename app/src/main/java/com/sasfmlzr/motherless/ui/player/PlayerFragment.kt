@@ -12,9 +12,6 @@ import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.upstream.DataSource
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.sasfmlzr.motherless.R
@@ -22,8 +19,10 @@ import com.sasfmlzr.motherless.data.repository.MotherlessRepository
 import com.sasfmlzr.motherless.databinding.FragmentPlayerBinding
 import com.sasfmlzr.motherless.di.core.FragmentComponent
 import com.sasfmlzr.motherless.di.core.Injector
-import kotlinx.coroutines.*
-import org.jsoup.Jsoup
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class PlayerFragment : Fragment() {
@@ -74,54 +73,20 @@ class PlayerFragment : Fragment() {
     fun parseSite(url: String) {
 
         CoroutineScope(Dispatchers.Default).launch {
-            val doc = Jsoup.connect(url).get().body()
 
-            val urlVideo = doc.getElementById("content").getElementsByTag("script").filter {
-                it.attr("type") == "text/javascript"
-            }[0].dataNodes()[0].wholeData.split("__fileurl = '")[1].split("';")[0]
-
-            val title =
-                doc.getElementById("media-info")
-                    .getElementsByClass("media-meta-info")
-                    .first()
-                    .getElementsByTag("h1")
-                    .first()
-                    .textNodes()
-                    .first()
-                    .text()
-
-            val videoDetails = doc.getElementById("media-info")
-                .getElementsByClass("media-meta-info")
-                .first()
-                .getElementsByTag("h2").map {
-                    val key = it.children().first().textNodes().first().text()
-                    val value = it.textNodes().last().text()
-                    Pair(key, value)
-                }
-
-            val tags = doc.getElementById("media-tags-container")
-                .children()
-                .map {
-                    it.getElementsByTag("h4")
-                }
-                .flatten()
-                .map {
-                    it.children().text()
-                }
-
+            val videoData = motherlessRepository.getVideoData(url)
             withContext(Dispatchers.Main) {
                 mediaSource = ProgressiveMediaSource.Factory(defaultHttpDataSource)
-                    .createMediaSource(Uri.parse(urlVideo))
+                    .createMediaSource(Uri.parse(videoData.urlVideo))
                 if (!isVideoPrepared) {
                     prepareVideo()
                 }
 
-                binding.nameVideo.text = title
-                binding.dateVideo.text = videoDetails[0].second
-                binding.viewedCount.text = videoDetails[1].second
-                binding.likeCount.text = videoDetails[2].second
-
-                binding.tags.text = "Tags: $tags"
+                binding.nameVideo.text = videoData.title
+                binding.dateVideo.text = videoData.dateVideo
+                binding.viewedCount.text = videoData.viewedCount
+                binding.likeCount.text = videoData.likeCount
+                binding.tags.text = "Tags: ${videoData.tags}"
             }
 
             println()
