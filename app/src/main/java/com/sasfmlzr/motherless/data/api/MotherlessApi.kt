@@ -9,6 +9,8 @@ interface MotherlessApi {
     @GET("/feeds/recent/videos?format=json")
     suspend fun getRecentVideos(): List<FeedVideosDTO>
 
+    @GET("/feeds/live/videos?format=json")
+    suspend fun getLatestViewedVideos(): List<FeedVideosDTO>
     //https://motherless.com/feeds/(recent|viewed|favorited|commented)/(images|videos)
 
     @GET("/feeds/favorited/videos?format=json")

@@ -53,7 +53,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-       initData()
+        initData()
 
         being_videos.setItems()
         popular_videos.setItems()
@@ -79,8 +79,8 @@ class HomeFragment : Fragment() {
         error_screen.setState(ErrorScreenView.State.RUNNING)
         initJob = CoroutineScope(Dispatchers.IO + handler).launch {
             delay(300)
-            val recentVideos = Converter.convertFeedVideosDTOsToPreviewEntity(
-                motherlessRepository.getRecentVideos().take(
+            val latestVideos = Converter.convertFeedVideosDTOsToPreviewEntity(
+                motherlessRepository.getLatestViewedVideos().take(
                     12
                 )
             )
@@ -96,7 +96,7 @@ class HomeFragment : Fragment() {
             )
             withContext(Dispatchers.Main) {
                 being_videos.setItems(
-                    recentVideos
+                    latestVideos
                 )
                 favorited_videos.setItems(
                     favoritesVideos

@@ -15,6 +15,10 @@ class LocalMotherlessRepository @Inject constructor(
         return api.getRecentVideos()
     }
 
+    override suspend fun getLatestViewedVideos(): List<FeedVideosDTO> {
+        return api.getLatestViewedVideos()
+    }
+
     override suspend fun getFavoritedVideos(): List<FeedVideosDTO> {
         return api.getFavoritedVideos()
     }
