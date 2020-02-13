@@ -18,4 +18,16 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="MaterialButton" parent="Widget.MaterialComponents.Button">
+        <!-- Customize your theme here. -->
+        <item name="backgroundTint">@color/lightGray</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+
+    <style name="ProgressBar" parent="Widget.AppCompat.ProgressBar">
+        <!-- Customize your theme here. -->
+        <item name="colorAccent">@color/lightGray</item>
+    </style>
+
 </resources>

@@ -13,6 +13,7 @@ import com.sasfmlzr.motherless.data.repository.MotherlessRepository
 import com.sasfmlzr.motherless.di.core.FragmentComponent
 import com.sasfmlzr.motherless.di.core.Injector
 import com.sasfmlzr.motherless.util.Converter
+import com.sasfmlzr.motherless.view.ErrorScreenView
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -23,6 +24,8 @@ class HomeFragment : Fragment() {
 
     @Inject
     lateinit var motherlessRepository: MotherlessRepository
+
+    lateinit var initJob: Job
 
     fun inject(component: FragmentComponent) = component.inject(this)
 
@@ -49,16 +52,33 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+       initData()
+
         being_videos.setItems()
         popular_videos.setItems()
         favorited_videos.setItems()
 
+        data_layout.visibility = View.GONE
+        error_screen.setRetryOnClickListener {
+            initData()
+        }
+    }
+
+    private fun initData() {
         val handler = CoroutineExceptionHandler { _, exception ->
             println("Caught $exception")
-            throw exception
+            exception.printStackTrace()
+            initJob.cancel()
+            CoroutineScope(Dispatchers.Main).launch {
+                error_screen.setState(ErrorScreenView.State.ERROR)
+                data_layout.visibility = View.GONE
+            }
         }
 
-        GlobalScope.launch(handler) {
+        error_screen.setState(ErrorScreenView.State.RUNNING)
+        initJob = CoroutineScope(Dispatchers.IO + handler).launch {
+            delay(300)
             val recentVideos = Converter.convertFeedVideosDTOsToPreviewEntity(
                 motherlessRepository.getRecentVideos().take(
                     12
@@ -84,6 +104,8 @@ class HomeFragment : Fragment() {
                 popular_videos.setItems(
                     mostViewedVideos
                 )
+                data_layout.visibility = View.VISIBLE
+                error_screen.setState(ErrorScreenView.State.OK)
             }
         }
     }

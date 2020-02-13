@@ -4,7 +4,7 @@
     <color name="colorPrimaryDark">@color/darkGray</color>
     <color name="colorAccent">#D81B60</color>
 
-    <color name="lightGray">#0e0e0e</color>
+    <color name="lightGray">#161616</color>
     <color name="darkGray">#0c0c0c</color>
     <color name="darkestGray">#010101</color>
 
