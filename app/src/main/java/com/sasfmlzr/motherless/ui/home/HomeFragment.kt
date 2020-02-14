@@ -10,12 +10,13 @@ import com.sasfmlzr.motherless.data.repository.MotherlessRepository
 import com.sasfmlzr.motherless.databinding.FragmentHomeBinding
 import com.sasfmlzr.motherless.di.core.FragmentComponent
 import com.sasfmlzr.motherless.di.core.Injector
+import com.sasfmlzr.motherless.entity.PreviewData
 import com.sasfmlzr.motherless.ui.BaseFragment
 import com.sasfmlzr.motherless.util.Converter
 import com.sasfmlzr.motherless.view.ErrorScreenView
-import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.*
 import javax.inject.Inject
+import kotlin.system.measureTimeMillis
 
 class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(HomeViewModel::class) {
 
@@ -28,6 +29,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(HomeViewMo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        isNetworkPage = true
         inject(Injector.fragmentComponent())
     }
 
@@ -44,65 +46,51 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(HomeViewMo
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+    override fun setRetryErrorListener() {
         initData()
-
-        being_videos.setItems()
-        popular_videos.setItems()
-        favorited_videos.setItems()
-
-        data_layout.visibility = View.GONE
-        error_screen.setRetryOnClickListener {
-            initData()
-        }
     }
 
     override fun initData() {
-        val handler = CoroutineExceptionHandler { _, exception ->
-            println("Caught $exception")
-            exception.printStackTrace()
-            initJob.cancel()
-            CoroutineScope(Dispatchers.Main).launch {
-                error_screen.setState(ErrorScreenView.State.ERROR)
-                data_layout.visibility = View.GONE
-            }
-        }
-
-        error_screen.setState(ErrorScreenView.State.RUNNING)
         initJob = CoroutineScope(Dispatchers.IO + handler).launch {
-            delay(300)
-            val latestVideos = Converter.convertFeedVideosDTOsToPreviewEntity(
-                motherlessRepository.getLatestViewedVideos().take(
-                    12
+            var latestVideos: List<PreviewData> = listOf()
+            var favoritesVideos: List<PreviewData> = listOf()
+            var mostViewedVideos: List<PreviewData> = listOf()
+            val measuredSeconds = measureTimeMillis {
+                latestVideos = Converter.convertFeedVideosDTOsToPreviewEntity(
+                    motherlessRepository.getLatestViewedVideos().take(
+                        12
+                    )
                 )
-            )
-            val favoritesVideos = Converter.convertFeedVideosDTOsToPreviewEntity(
-                motherlessRepository.getFavoritedVideos().take(
-                    12
+                favoritesVideos = Converter.convertFeedVideosDTOsToPreviewEntity(
+                    motherlessRepository.getFavoritedVideos().take(
+                        12
+                    )
                 )
-            )
-            val mostViewedVideos = Converter.convertFeedVideosDTOsToPreviewEntity(
-                motherlessRepository.getViewedVideos().take(
-                    12
+                mostViewedVideos = Converter.convertFeedVideosDTOsToPreviewEntity(
+                    motherlessRepository.getViewedVideos().take(
+                        12
+                    )
                 )
-            )
+            }
+
+            val delayMeasuredSeconds = 300
+            if (measuredSeconds < delayMeasuredSeconds) {
+                delay(delayMeasuredSeconds - measuredSeconds)
+            }
+
             withContext(Dispatchers.Main) {
-                being_videos.setItems(
+                binding.beingVideos.setItems(
                     latestVideos
                 )
-                favorited_videos.setItems(
+                binding.favoritedVideos.setItems(
                     favoritesVideos
                 )
-                popular_videos.setItems(
+                binding.popularVideos.setItems(
                     mostViewedVideos
                 )
-                data_layout.visibility = View.VISIBLE
-                error_screen.setState(ErrorScreenView.State.OK)
+                dataLayout?.visibility = View.VISIBLE
+                errorScreenView?.setState(ErrorScreenView.State.OK)
             }
         }
     }
-
-
 }

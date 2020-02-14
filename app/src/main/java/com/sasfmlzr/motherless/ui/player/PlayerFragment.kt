@@ -15,32 +15,27 @@ import com.sasfmlzr.motherless.R
 import com.sasfmlzr.motherless.data.repository.MotherlessRepository
 import com.sasfmlzr.motherless.databinding.FragmentPlayerBinding
 import com.sasfmlzr.motherless.di.core.FragmentComponent
-import com.sasfmlzr.motherless.di.core.Injector
 import com.sasfmlzr.motherless.ui.BaseFragment
 import com.sasfmlzr.motherless.view.ErrorScreenView
-import kotlinx.android.synthetic.main.fragment_home.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class PlayerFragment :
     BaseFragment<PlayerViewModel, FragmentPlayerBinding>(PlayerViewModel::class) {
 
-    private lateinit var defaultHttpDataSource: DefaultHttpDataSourceFactory
-
     @Inject
     lateinit var motherlessRepository: MotherlessRepository
 
+    override fun getLayoutId(): Int = R.layout.fragment_player
+
+    private lateinit var defaultHttpDataSource: DefaultHttpDataSourceFactory
+    private lateinit var mediaSource: ProgressiveMediaSource
     private var isVideoPrepared = false
 
     override fun inject(component: FragmentComponent) = component.inject(this)
-
-    private lateinit var mediaSource: ProgressiveMediaSource
-    override fun getLayoutId(): Int = R.layout.fragment_player
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        inject(Injector.fragmentComponent())
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,31 +44,22 @@ class PlayerFragment :
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         val agent = Util.getUserAgent(context!!, getString(R.string.app_name))
-
         defaultHttpDataSource = DefaultHttpDataSourceFactory(agent, null)
 
+        binding.playerView.player = SimpleExoPlayer.Builder(binding.playerView.context).build()
+
+        val player = binding.playerView.player as SimpleExoPlayer
+        player.addListener(playerListener)
         return binding.root
     }
-
 
     override fun initData() {
         val url = arguments?.getString("KEY_URL") ?: ""
         parseSite(url)
     }
 
-    fun parseSite(url: String) {
-        val handler = CoroutineExceptionHandler { _, exception ->
-            println("Caught $exception")
-            exception.printStackTrace()
-            initJob.cancel()
-            CoroutineScope(Dispatchers.Main).launch {
-                error_screen.setState(ErrorScreenView.State.ERROR)
-                data_layout.visibility = View.GONE
-            }
-        }
-        error_screen.setState(ErrorScreenView.State.RUNNING)
+    private fun parseSite(url: String) {
         initJob = CoroutineScope(Dispatchers.Default + handler).launch {
-
             val videoData = motherlessRepository.getVideoData(url)
             withContext(Dispatchers.Main) {
                 mediaSource = ProgressiveMediaSource.Factory(defaultHttpDataSource)
@@ -87,33 +73,10 @@ class PlayerFragment :
                 binding.viewedCount.text = videoData.viewedCount
                 binding.likeCount.text = videoData.likeCount
                 binding.tags.text = "Tags: ${videoData.tags}"
-                data_layout.visibility = View.VISIBLE
-                error_screen.setState(ErrorScreenView.State.OK)
+                dataLayout?.visibility = View.VISIBLE
+                errorScreenView?.setState(ErrorScreenView.State.OK)
             }
-
-            println()
         }
-
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        initData()
-        binding.playerView.player = SimpleExoPlayer.Builder(binding.playerView.context).build()
-
-        binding.playerView.setOnFocusChangeListener { _, _ ->
-            println("WTF")
-        }
-
-        val player = binding.playerView.player as SimpleExoPlayer
-        player.addListener(playerListener)
-
-        data_layout.visibility = View.GONE
-        error_screen.setRetryOnClickListener {
-            initData()
-        }
-
     }
 
     override fun onStop() {
