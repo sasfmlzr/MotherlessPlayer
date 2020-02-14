@@ -6,7 +6,7 @@ import com.sasfmlzr.motherless.ui.player.PlayerFragment
 import dagger.Subcomponent
 
 @FragmentScope
-@Subcomponent()
+@Subcomponent(modules = [FragmentVMFactoryModule::class])
 interface FragmentComponent {
     fun inject(fragment: HomeFragment)
     fun inject(fragment: PlayerFragment)

@@ -5,9 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
 import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -19,27 +16,27 @@ import com.sasfmlzr.motherless.data.repository.MotherlessRepository
 import com.sasfmlzr.motherless.databinding.FragmentPlayerBinding
 import com.sasfmlzr.motherless.di.core.FragmentComponent
 import com.sasfmlzr.motherless.di.core.Injector
+import com.sasfmlzr.motherless.ui.BaseFragment
 import com.sasfmlzr.motherless.view.ErrorScreenView
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
-class PlayerFragment : Fragment() {
+class PlayerFragment :
+    BaseFragment<PlayerViewModel, FragmentPlayerBinding>(PlayerViewModel::class) {
 
-    private lateinit var playerViewModel: PlayerViewModel
     private lateinit var defaultHttpDataSource: DefaultHttpDataSourceFactory
-
-    lateinit var initJob: Job
 
     @Inject
     lateinit var motherlessRepository: MotherlessRepository
 
     private var isVideoPrepared = false
 
-    fun inject(component: FragmentComponent) = component.inject(this)
+    override fun inject(component: FragmentComponent) = component.inject(this)
 
-    private lateinit var binding: FragmentPlayerBinding
     private lateinit var mediaSource: ProgressiveMediaSource
+    override fun getLayoutId(): Int = R.layout.fragment_player
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         inject(Injector.fragmentComponent())
@@ -50,17 +47,7 @@ class PlayerFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_player, container, false)
-        binding = DataBindingUtil.inflate(
-            inflater,
-            R.layout.fragment_player,
-            container,
-            false
-        )
-        playerViewModel =
-            ViewModelProviders.of(this).get(PlayerViewModel::class.java)
-
-
+        super.onCreateView(inflater, container, savedInstanceState)
         val agent = Util.getUserAgent(context!!, getString(R.string.app_name))
 
         defaultHttpDataSource = DefaultHttpDataSourceFactory(agent, null)
@@ -69,7 +56,7 @@ class PlayerFragment : Fragment() {
     }
 
 
-    private fun initData() {
+    override fun initData() {
         val url = arguments?.getString("KEY_URL") ?: ""
         parseSite(url)
     }
