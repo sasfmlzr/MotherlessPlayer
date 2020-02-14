@@ -19,16 +19,17 @@ import com.sasfmlzr.motherless.data.repository.MotherlessRepository
 import com.sasfmlzr.motherless.databinding.FragmentPlayerBinding
 import com.sasfmlzr.motherless.di.core.FragmentComponent
 import com.sasfmlzr.motherless.di.core.Injector
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.sasfmlzr.motherless.view.ErrorScreenView
+import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class PlayerFragment : Fragment() {
 
     private lateinit var playerViewModel: PlayerViewModel
     private lateinit var defaultHttpDataSource: DefaultHttpDataSourceFactory
+
+    lateinit var initJob: Job
 
     @Inject
     lateinit var motherlessRepository: MotherlessRepository
@@ -59,9 +60,6 @@ class PlayerFragment : Fragment() {
         playerViewModel =
             ViewModelProviders.of(this).get(PlayerViewModel::class.java)
 
-        val url = arguments?.getString("KEY_URL") ?: ""
-
-        parseSite(url)
 
         val agent = Util.getUserAgent(context!!, getString(R.string.app_name))
 
@@ -70,9 +68,24 @@ class PlayerFragment : Fragment() {
         return binding.root
     }
 
-    fun parseSite(url: String) {
 
-        CoroutineScope(Dispatchers.Default).launch {
+    private fun initData() {
+        val url = arguments?.getString("KEY_URL") ?: ""
+        parseSite(url)
+    }
+
+    fun parseSite(url: String) {
+        val handler = CoroutineExceptionHandler { _, exception ->
+            println("Caught $exception")
+            exception.printStackTrace()
+            initJob.cancel()
+            CoroutineScope(Dispatchers.Main).launch {
+                error_screen.setState(ErrorScreenView.State.ERROR)
+                data_layout.visibility = View.GONE
+            }
+        }
+        error_screen.setState(ErrorScreenView.State.RUNNING)
+        initJob = CoroutineScope(Dispatchers.Default + handler).launch {
 
             val videoData = motherlessRepository.getVideoData(url)
             withContext(Dispatchers.Main) {
@@ -87,6 +100,8 @@ class PlayerFragment : Fragment() {
                 binding.viewedCount.text = videoData.viewedCount
                 binding.likeCount.text = videoData.likeCount
                 binding.tags.text = "Tags: ${videoData.tags}"
+                data_layout.visibility = View.VISIBLE
+                error_screen.setState(ErrorScreenView.State.OK)
             }
 
             println()
@@ -96,6 +111,8 @@ class PlayerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        initData()
         binding.playerView.player = SimpleExoPlayer.Builder(binding.playerView.context).build()
 
         binding.playerView.setOnFocusChangeListener { _, _ ->
@@ -104,6 +121,11 @@ class PlayerFragment : Fragment() {
 
         val player = binding.playerView.player as SimpleExoPlayer
         player.addListener(playerListener)
+
+        data_layout.visibility = View.GONE
+        error_screen.setRetryOnClickListener {
+            initData()
+        }
 
     }
 
