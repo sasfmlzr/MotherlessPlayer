@@ -2,6 +2,7 @@ package com.sasfmlzr.motherless.data.api
 
 import com.sasfmlzr.motherless.data.dto.recentVideos.FeedVideosDTO
 import retrofit2.http.GET
+import retrofit2.http.Path
 
 interface MotherlessApi {
 
@@ -21,4 +22,7 @@ interface MotherlessApi {
 
     @GET("/feeds/commented/videos?format=json")
     suspend fun getCommentedVideos(): List<FeedVideosDTO>
+
+    @GET("/feeds/search/{query}/videos?format=json")
+    suspend fun getSearchVideosByQuery(@Path("query") query: String): List<FeedVideosDTO>
 }

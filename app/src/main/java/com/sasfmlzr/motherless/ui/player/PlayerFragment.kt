@@ -11,6 +11,7 @@ import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.util.Util
+import com.sasfmlzr.motherless.MainActivity
 import com.sasfmlzr.motherless.R
 import com.sasfmlzr.motherless.data.repository.MotherlessRepository
 import com.sasfmlzr.motherless.databinding.FragmentPlayerBinding
@@ -37,6 +38,8 @@ class PlayerFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         isNetworkPage = true
+
+        (activity as MainActivity).setVisibilitySearchViewItem(false)
     }
 
     override fun onCreateView(

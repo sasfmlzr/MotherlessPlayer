@@ -18,6 +18,10 @@ import kotlin.system.measureTimeMillis
 
 class SearchFragment : BaseFragment<SearchViewModel, FragmentHomeBinding>(SearchViewModel::class) {
 
+    companion object {
+        const val KEY_QUERY_SEARCH = "KEY_QUERY_SEARCH"
+    }
+
     @Inject
     lateinit var motherlessRepository: MotherlessRepository
 
@@ -45,14 +49,14 @@ class SearchFragment : BaseFragment<SearchViewModel, FragmentHomeBinding>(Search
     }
 
     override fun initData() {
+        val searchQuery = arguments?.getString(KEY_QUERY_SEARCH)?:""
+
         initJob = CoroutineScope(Dispatchers.IO + handler + Job()).launch {
             var latestVideos: List<PreviewData> = listOf()
 
             val measuredSeconds = measureTimeMillis {
                 latestVideos = Converter.convertFeedVideosDTOsToPreviewEntity(
-                    motherlessRepository.getLatestViewedVideos().take(
-                        12
-                    )
+                    motherlessRepository.getSearchVideosByQuery(searchQuery)
                 )
             }
 

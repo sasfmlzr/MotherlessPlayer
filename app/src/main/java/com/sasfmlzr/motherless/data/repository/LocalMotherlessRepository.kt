@@ -31,6 +31,10 @@ class LocalMotherlessRepository @Inject constructor(
         return api.getCommentedVideos()
     }
 
+    override suspend fun getSearchVideosByQuery(query: String): List<FeedVideosDTO> {
+        return api.getSearchVideosByQuery(query)
+    }
+
     override fun getVideoData(url: String): VideoData {
         return jsoupApi.getVideoPage(url)
     }

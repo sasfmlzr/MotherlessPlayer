@@ -39,26 +39,31 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
     }
 
+    private lateinit var searchItem: MenuItem
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
 
-        val searchItem: MenuItem? = menu.findItem(R.id.action_search)
-        val searchView = searchItem?.actionView as SearchView
+        searchItem = menu.findItem(R.id.action_search)
+        val searchView = searchItem.actionView as SearchView
 
-        searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-               return false
+                return false
             }
         })
 
-
-
         return true
+    }
+
+    fun setVisibilitySearchViewItem(isVisible: Boolean) {
+        searchItem.isVisible = isVisible
+        println()
     }
 
     override fun onSupportNavigateUp(): Boolean {

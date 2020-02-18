@@ -9,5 +9,6 @@ interface MotherlessRepository {
     suspend fun getFavoritedVideos(): List<FeedVideosDTO>
     suspend fun getViewedVideos(): List<FeedVideosDTO>
     suspend fun getCommentedVideos(): List<FeedVideosDTO>
+    suspend fun getSearchVideosByQuery(query: String): List<FeedVideosDTO>
     fun getVideoData(url: String): VideoData
 }

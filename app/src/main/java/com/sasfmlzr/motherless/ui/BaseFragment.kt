@@ -71,8 +71,12 @@ protected constructor(private val viewModelClass: KClass<VM>) : Fragment() {
             if (errorScreenView != null) {
                 dataLayout?.visibility = View.GONE
                 errorScreenView?.setState(ErrorScreenView.State.RUNNING)
+                errorScreenView?.setRetryOnClickListener {
+                    errorScreenView?.setState(ErrorScreenView.State.RUNNING)
+                    dataLayout?.visibility = View.GONE
+                    setRetryErrorListener()
+                }
             }
-            setRetryErrorListener()
         }
 
         initData()
