@@ -1,4 +1,4 @@
-package com.sasfmlzr.motherless.ui.home
+package com.sasfmlzr.motherless.ui.search
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -18,14 +18,14 @@ import kotlinx.coroutines.*
 import javax.inject.Inject
 import kotlin.system.measureTimeMillis
 
-class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(HomeViewModel::class) {
+class SearchFragment : BaseFragment<SearchViewModel, FragmentHomeBinding>(SearchViewModel::class) {
 
     @Inject
     lateinit var motherlessRepository: MotherlessRepository
 
     override fun inject(component: FragmentComponent) = component.inject(this)
 
-    override fun getLayoutId(): Int = R.layout.fragment_home
+    override fun getLayoutId(): Int = R.layout.fragment_search
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,9 +39,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(HomeViewMo
         savedInstanceState: Bundle?
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        viewModel.text.observe(this, Observer {
-            binding.textHome.text = it
-        })
 
         return binding.root
     }
@@ -53,21 +50,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(HomeViewMo
     override fun initData() {
         initJob = CoroutineScope(Dispatchers.IO + handler + Job()).launch {
             var latestVideos: List<PreviewData> = listOf()
-            var favoritesVideos: List<PreviewData> = listOf()
-            var mostViewedVideos: List<PreviewData> = listOf()
+
             val measuredSeconds = measureTimeMillis {
                 latestVideos = Converter.convertFeedVideosDTOsToPreviewEntity(
                     motherlessRepository.getLatestViewedVideos().take(
-                        12
-                    )
-                )
-                favoritesVideos = Converter.convertFeedVideosDTOsToPreviewEntity(
-                    motherlessRepository.getFavoritedVideos().take(
-                        12
-                    )
-                )
-                mostViewedVideos = Converter.convertFeedVideosDTOsToPreviewEntity(
-                    motherlessRepository.getViewedVideos().take(
                         12
                     )
                 )
@@ -81,12 +67,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(HomeViewMo
             withContext(Dispatchers.Main) {
                 binding.beingVideos.setItems(
                     latestVideos
-                )
-                binding.favoritedVideos.setItems(
-                    favoritesVideos
-                )
-                binding.popularVideos.setItems(
-                    mostViewedVideos
                 )
                 dataLayout?.visibility = View.VISIBLE
                 errorScreenView?.setState(ErrorScreenView.State.OK)
