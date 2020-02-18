@@ -9,7 +9,6 @@ import com.sasfmlzr.motherless.R
 import com.sasfmlzr.motherless.data.repository.MotherlessRepository
 import com.sasfmlzr.motherless.databinding.FragmentHomeBinding
 import com.sasfmlzr.motherless.di.core.FragmentComponent
-import com.sasfmlzr.motherless.di.core.Injector
 import com.sasfmlzr.motherless.entity.PreviewData
 import com.sasfmlzr.motherless.ui.BaseFragment
 import com.sasfmlzr.motherless.util.Converter
@@ -30,7 +29,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(HomeViewMo
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         isNetworkPage = true
-        inject(Injector.fragmentComponent())
     }
 
     override fun onCreateView(

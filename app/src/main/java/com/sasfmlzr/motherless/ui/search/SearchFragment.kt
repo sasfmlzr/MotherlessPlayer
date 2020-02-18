@@ -4,12 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
 import com.sasfmlzr.motherless.R
 import com.sasfmlzr.motherless.data.repository.MotherlessRepository
 import com.sasfmlzr.motherless.databinding.FragmentHomeBinding
 import com.sasfmlzr.motherless.di.core.FragmentComponent
-import com.sasfmlzr.motherless.di.core.Injector
 import com.sasfmlzr.motherless.entity.PreviewData
 import com.sasfmlzr.motherless.ui.BaseFragment
 import com.sasfmlzr.motherless.util.Converter
@@ -30,7 +28,6 @@ class SearchFragment : BaseFragment<SearchViewModel, FragmentHomeBinding>(Search
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         isNetworkPage = true
-        inject(Injector.fragmentComponent())
     }
 
     override fun onCreateView(

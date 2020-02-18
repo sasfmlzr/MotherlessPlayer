@@ -79,6 +79,13 @@ protected constructor(private val viewModelClass: KClass<VM>) : Fragment() {
         return view
     }
 
+    override fun onStop() {
+        if (::initJob.isInitialized && isNetworkPage) {
+            initJob.cancel()
+        }
+        super.onStop()
+    }
+
     protected open fun setRetryErrorListener() {
         println("Retry button has clicked")
     }

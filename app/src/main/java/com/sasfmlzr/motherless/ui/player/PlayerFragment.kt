@@ -17,10 +17,7 @@ import com.sasfmlzr.motherless.databinding.FragmentPlayerBinding
 import com.sasfmlzr.motherless.di.core.FragmentComponent
 import com.sasfmlzr.motherless.ui.BaseFragment
 import com.sasfmlzr.motherless.view.ErrorScreenView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class PlayerFragment :
@@ -29,13 +26,18 @@ class PlayerFragment :
     @Inject
     lateinit var motherlessRepository: MotherlessRepository
 
+    override fun inject(component: FragmentComponent) = component.inject(this)
+
     override fun getLayoutId(): Int = R.layout.fragment_player
 
     private lateinit var defaultHttpDataSource: DefaultHttpDataSourceFactory
     private lateinit var mediaSource: ProgressiveMediaSource
     private var isVideoPrepared = false
 
-    override fun inject(component: FragmentComponent) = component.inject(this)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        isNetworkPage = true
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,14 +45,19 @@ class PlayerFragment :
         savedInstanceState: Bundle?
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
+
         val agent = Util.getUserAgent(context!!, getString(R.string.app_name))
         defaultHttpDataSource = DefaultHttpDataSourceFactory(agent, null)
-
         binding.playerView.player = SimpleExoPlayer.Builder(binding.playerView.context).build()
 
         val player = binding.playerView.player as SimpleExoPlayer
         player.addListener(playerListener)
+
         return binding.root
+    }
+
+    override fun setRetryErrorListener() {
+        initData()
     }
 
     override fun initData() {
@@ -59,7 +66,7 @@ class PlayerFragment :
     }
 
     private fun parseSite(url: String) {
-        initJob = CoroutineScope(Dispatchers.Default + handler).launch {
+        initJob = CoroutineScope(Dispatchers.Default + handler + Job()).launch {
             val videoData = motherlessRepository.getVideoData(url)
             withContext(Dispatchers.Main) {
                 mediaSource = ProgressiveMediaSource.Factory(defaultHttpDataSource)
