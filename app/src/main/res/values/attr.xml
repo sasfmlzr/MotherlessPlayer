@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="CodeEditText">
+        <attr name="strokeHeight" format="dimension" />
+        <attr name="strokeWidth" format="dimension" />
+        <attr name="strokePadding" format="dimension" />
+        <attr name="strokeBackground" format="reference" />
+        <attr name="strokeLength" format="integer" />
+    </declare-styleable>
+
+
+    <declare-styleable name="PinViewTheme">
+        <attr name="pinViewStyle" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="PinView">
+        <attr name="itemCount" format="integer" />
+        <attr name="itemWidth" format="dimension" />
+        <attr name="itemHeight" format="dimension" />
+        <attr name="itemRadius" format="dimension" />
+        <attr name="itemSpacing" format="dimension" />
+        <attr name="lineWidth" format="dimension" />
+        <attr name="lineColor" format="reference|color" />
+        <attr name="android:cursorVisible" />
+        <attr name="cursorWidth" format="dimension" />
+        <attr name="cursorColor" format="reference|color" />
+        <attr name="android:itemBackground" />
+        <attr name="selectedColorBackground" format="color"/>
+        <attr name="showLineWhenFilled" format="boolean" />
+    </declare-styleable>
+</resources>

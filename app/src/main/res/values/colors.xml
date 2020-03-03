@@ -10,4 +10,6 @@
 
     <color name="cardVideos">#161616</color>
 
+    <color name="colorRound">#74BD26</color>
+    <color name="lightGrey2">#E1D9CA</color>
 </resources>
