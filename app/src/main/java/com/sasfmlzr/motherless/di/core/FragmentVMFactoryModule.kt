@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.sasfmlzr.motherless.ui.home.HomeViewModel
 import com.sasfmlzr.motherless.ui.player.PlayerViewModel
+import com.sasfmlzr.motherless.ui.search.SearchViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
@@ -24,4 +25,9 @@ internal abstract class FragmentVMFactoryModule {
     @IntoMap
     @ViewModelKey(PlayerViewModel::class)
     internal abstract fun previewVM(VM: PlayerViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(SearchViewModel::class)
+    internal abstract fun searchVM(VM: SearchViewModel): ViewModel
 }

@@ -6,6 +6,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
+import androidx.core.os.bundleOf
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -13,6 +14,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
+import com.sasfmlzr.motherless.ui.search.SearchFragment.Companion.KEY_QUERY_SEARCH
 
 class MainActivity : AppCompatActivity() {
 
@@ -50,7 +52,12 @@ class MainActivity : AppCompatActivity() {
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
+                return if (query != null && query.length >= 3) {
+                    findNavController(R.id.nav_host_fragment)
+                        .navigate(R.id.nav_search, bundleOf(Pair(KEY_QUERY_SEARCH, query)))
+                    searchView.setQuery("", false)
+                    false
+                } else true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
